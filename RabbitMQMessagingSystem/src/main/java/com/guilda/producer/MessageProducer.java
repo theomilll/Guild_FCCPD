@@ -23,17 +23,13 @@ public class MessageProducer {
 
         ConnectionFactory factory = new ConnectionFactory();
         try {
-            // Configurações da conexão com RabbitMQ
             factory.setUri("amqps://dzrfdabj:XauaSYvj4PxJi96VY6Iowsrlfq2lMA9Y@prawn.rmq.cloudamqp.com/dzrfdabj"); // Atualize com novas credenciais
 
-            // Estabelece a conexão e o canal uma única vez
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
 
-            // Declara a exchange 'guilda_direct_exchange' do tipo 'direct'
             channel.exchangeDeclare(EXCHANGE_NAME, EXCHANGE_TYPE, true);
 
-            // Adiciona um shutdown hook para fechar a conexão de forma graciosa
             final Connection finalConnection = connection;
             final Channel finalChannel = channel;
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -53,18 +49,15 @@ public class MessageProducer {
 
             logger.info("Produtor iniciado. Você pode começar a enviar mensagens. Para encerrar, pressione CTRL+C ou digite 'exit'.");
 
-            // Loop para enviar mensagens continuamente
             while (true) {
                 System.out.print("Digite a mensagem (ou 'exit' para encerrar): ");
                 String messageBody = scanner.nextLine();
 
-                // Permitir que o usuário encerre o programa digitando 'exit'
                 if (messageBody.equalsIgnoreCase("exit")) {
                     logger.info("Encerrando o produtor conforme solicitado.");
                     break;
                 }
 
-                // Solicita o role para a mensagem via opções numéricas
                 String role;
                 while (true) {
                     System.out.println("Escolha o role para a mensagem:");
@@ -85,7 +78,7 @@ public class MessageProducer {
                             role = "dps";
                             break;
                         case "4":
-                            role = "broadcast"; // Define 'broadcast' para enviar para todos
+                            role = "broadcast";
                             break;
                         default:
                             System.out.println("Opção inválida. Por favor, digite de 1 a 4.");
@@ -94,20 +87,17 @@ public class MessageProducer {
                     break;
                 }
 
-                // Formata a mensagem
                 String timestamp = new SimpleDateFormat("dd/MM/yyyy - HH:mm").format(new Date());
                 String message = String.format("[%s] %s : %s", timestamp, producerName, messageBody);
 
                 try {
                     if (role.equals("broadcast")) {
-                        // Envia a mensagem para todos os roles (tank, healer, dps)
                         String[] roles = {"tank", "healer", "dps"};
                         for (String r : roles) {
                             channel.basicPublish(EXCHANGE_NAME, r, null, message.getBytes("UTF-8"));
                             logger.info("Mensagem enviada para role '" + r + "': " + message);
                         }
                     } else {
-                        // Publica a mensagem no exchange com a routing key correspondente ao role
                         channel.basicPublish(EXCHANGE_NAME, role, null, message.getBytes("UTF-8"));
                         logger.info("Mensagem enviada: " + message + " [Role: " + role + "]");
                     }
@@ -116,7 +106,6 @@ public class MessageProducer {
                 }
             }
 
-            // Fecha o canal e a conexão após o loop
             if (channel != null && channel.isOpen()) {
                 channel.close();
                 logger.info("Canal fechado.");

@@ -9,7 +9,6 @@ def callback(ch, method, properties, body):
     print(f" [CONSUMER] Recebido: {mensagem}")
 
 def main():
-    # AMQP URI do CloudAMQP
     amqp_url = 'amqps://dzrfdabj:XauaSYvj4PxJi96VY6Iowsrlfq2lMA9Y@prawn.rmq.cloudamqp.com/dzrfdabj'
     parameters = pika.URLParameters(amqp_url)
     try:
@@ -20,10 +19,8 @@ def main():
 
     channel = connection.channel()
 
-    # Declara a exchange censurada 'censored_direct_exchange'
     channel.exchange_declare(exchange=EXCHANGE_NAME, exchange_type=EXCHANGE_TYPE, durable=True)
 
-    # Solicita o role do consumidor com opções numéricas
     role = ''
     while True:
         print("Selecione seu role:")
@@ -43,26 +40,22 @@ def main():
             role = "dps"
             break
         elif opcao == "4":
-            role = "all"  # Define 'all' para receber todas as mensagens
+            role = "all"
             break
         else:
             print("Opção inválida. Por favor, digite de 1 a 4.")
 
-    # Cria uma fila exclusiva para este consumidor
     result = channel.queue_declare(queue='', exclusive=True)
     queue_name = result.method.queue
 
-    # Vincula a fila à exchange censurada com a routing key correspondente
     if role != "all":
         channel.queue_bind(exchange=EXCHANGE_NAME, queue=queue_name, routing_key=role)
         print(f' [CONSUMER] Aguardando mensagens para o role "{role}". Para sair, pressione CTRL+C')
     else:
-        # Vincula a fila a todas as routing keys (tank, healer, dps, broadcast)
         for rk in ['tank', 'healer', 'dps', 'broadcast']:
             channel.queue_bind(exchange=EXCHANGE_NAME, queue=queue_name, routing_key=rk)
         print(' [CONSUMER] Aguardando todas as mensagens. Para sair, pressione CTRL+C')
 
-    # Consumidor
     channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
 
     try:
