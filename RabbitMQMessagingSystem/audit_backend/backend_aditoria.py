@@ -8,7 +8,7 @@ EXCHANGE_TYPE = 'direct'
 CENSORED_EXCHANGE = 'censored_direct_exchange'
 CENSORED_EXCHANGE_TYPE = 'direct'
 
-PROHIBITED_WORDS = ['raid', 'massacre', 'steal']
+PROHIBITED_WORDS = ['fccpd nao e legal', 'massacre', 'steal', 'demeter', 'palavroes', 'xingar', 'troll', 'griefing', 'fccpd', 'adaurekt', 'guigo', 'pedrao', 'theo']
 
 def censurar_mensagem(mensagem):
     for palavra in PROHIBITED_WORDS:
