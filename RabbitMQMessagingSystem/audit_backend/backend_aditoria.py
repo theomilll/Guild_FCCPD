@@ -34,7 +34,7 @@ def callback(ch, method, properties, body):
         print(f" [AUDITORIA] Erro ao publicar mensagem censurada: {e}")
 
 def main():
-    amqp_url = 'amqps://dzrfdabj:XauaSYvj4PxJi96VY6Iowsrlfq2lMA9Y@prawn.rmq.cloudamqp.com/dzrfdabj'  # Atualize com novas credenciais
+    amqp_url = 'amqps://dzrfdabj:XauaSYvj4PxJi96VY6Iowsrlfq2lMA9Y@prawn.rmq.cloudamqp.com/dzrfdabj'
 
     parameters = pika.URLParameters(amqp_url)
     try:

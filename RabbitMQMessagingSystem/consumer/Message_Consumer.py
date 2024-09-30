@@ -27,8 +27,7 @@ def main():
         print("1 - Tank")
         print("2 - Healer")
         print("3 - DPS")
-        print("4 - Null (receber todas as mensagens)")
-        opcao = input("Digite a opção (1-4): ")
+        opcao = input("Digite a opção (1-3): ")
 
         if opcao == "1":
             role = "tank"
@@ -39,11 +38,8 @@ def main():
         elif opcao == "3":
             role = "dps"
             break
-        elif opcao == "4":
-            role = "all"
-            break
         else:
-            print("Opção inválida. Por favor, digite de 1 a 4.")
+            print("Opção inválida. Por favor, digite de 1 a 3.")
 
     result = channel.queue_declare(queue='', exclusive=True)
     queue_name = result.method.queue

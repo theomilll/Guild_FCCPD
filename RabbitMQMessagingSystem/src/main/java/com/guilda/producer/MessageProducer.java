@@ -14,7 +14,7 @@ public class MessageProducer {
 
     private static final Logger logger = LoggerFactory.getLogger(MessageProducer.class);
     private static final String EXCHANGE_NAME = "guilda_direct_exchange";
-    private static final String EXCHANGE_TYPE = "direct"; // Tipo 'direct'
+    private static final String EXCHANGE_TYPE = "direct";
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -23,7 +23,7 @@ public class MessageProducer {
 
         ConnectionFactory factory = new ConnectionFactory();
         try {
-            factory.setUri("amqps://dzrfdabj:XauaSYvj4PxJi96VY6Iowsrlfq2lMA9Y@prawn.rmq.cloudamqp.com/dzrfdabj"); // Atualize com novas credenciais
+            factory.setUri("amqps://dzrfdabj:XauaSYvj4PxJi96VY6Iowsrlfq2lMA9Y@prawn.rmq.cloudamqp.com/dzrfdabj");
 
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
