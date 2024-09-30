@@ -5,8 +5,10 @@ import re
 EXCHANGE_NAME = 'guilda_exchange'
 EXCHANGE_TYPE = 'fanout'
 
-# Lista de palavras proibidas
-PROHIBITED_WORDS = ['raid', 'massacre', 'steal']  # Substitua pelas palavras reais
+CENSORED_EXCHANGE = 'censored_exchange'
+CENSORED_EXCHANGE_TYPE = 'fanout'
+
+PROHIBITED_WORDS = ['raid', 'massacre', 'steal']
 
 def censurar_mensagem(mensagem):
     for palavra in PROHIBITED_WORDS:
@@ -18,12 +20,21 @@ def callback(ch, method, properties, body):
     censurada = censurar_mensagem(mensagem)
     print(f" [AUDITORIA] {censurada}")
 
-def main():
-    # AMQP URI do CloudAMQP
-    amqp_url = 'amqps://dzrfdabj:XauaSYvj4PxJi96VY6Iowsrlfq2lMA9Y@prawn.rmq.cloudamqp.com/dzrfdabj'
+    try:
+        ch.basic_publish(
+            exchange=CENSORED_EXCHANGE,
+            routing_key='',
+            body=censurada.encode('utf-8'),
+            properties=pika.BasicProperties(
+                delivery_mode=2,
+            )
+        )
+        print(f" [AUDITORIA] Mensagem censurada publicada: {censurada}")
+    except Exception as e:
+        print(f" [AUDITORIA] Erro ao publicar mensagem censurada: {e}")
 
-    # Alternativamente, use variáveis de ambiente
-    # amqp_url = os.getenv('CLOUDAMQP_URL')
+def main():
+    amqp_url = 'amqps://dzrfdabj:XauaSYvj4PxJi96VY6Iowsrlfq2lMA9Y@prawn.rmq.cloudamqp.com/dzrfdabj'
 
     parameters = pika.URLParameters(amqp_url)
     try:
@@ -34,19 +45,17 @@ def main():
 
     channel = connection.channel()
 
-    # Declara o exchange
     channel.exchange_declare(exchange=EXCHANGE_NAME, exchange_type=EXCHANGE_TYPE, durable=True)
 
-    # Cria uma fila exclusiva para este consumidor
+    channel.exchange_declare(exchange=CENSORED_EXCHANGE, exchange_type=CENSORED_EXCHANGE_TYPE, durable=True)
+
     result = channel.queue_declare(queue='', exclusive=True)
     queue_name = result.method.queue
 
-    # Liga a fila ao exchange
     channel.queue_bind(exchange=EXCHANGE_NAME, queue=queue_name)
 
     print(' [AUDITORIA] Aguardando mensagens para auditoria. Para sair, pressione CTRL+C')
 
-    # Consumidor
     channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
 
     try:

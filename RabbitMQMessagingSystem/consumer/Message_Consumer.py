@@ -1,11 +1,12 @@
 import pika
 import os
 
-EXCHANGE_NAME = 'guilda_exchange'
+EXCHANGE_NAME = 'censored_exchange'
 EXCHANGE_TYPE = 'fanout'
 
 def callback(ch, method, properties, body):
-    print(f" [x] Recebido {body.decode()}")
+    mensagem = body.decode()
+    print(f" [CONSUMER] Recebido: {mensagem}")
 
 def main():
     amqp_url = 'amqps://dzrfdabj:XauaSYvj4PxJi96VY6Iowsrlfq2lMA9Y@prawn.rmq.cloudamqp.com/dzrfdabj'
@@ -26,14 +27,14 @@ def main():
 
     channel.queue_bind(exchange=EXCHANGE_NAME, queue=queue_name)
 
-    print(' [*] Aguardando mensagens. Para sair, pressione CTRL+C')
+    print(' [CONSUMER]Para sair, pressione CTRL+C')
 
     channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
 
     try:
         channel.start_consuming()
     except KeyboardInterrupt:
-        print(" [*] Consumidor interrompido")
+        print(" [CONSUMER] Consumidor interrompido")
         channel.stop_consuming()
     finally:
         connection.close()
