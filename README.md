@@ -24,3 +24,10 @@ Backend Auditing: Censura palavras proibidas antes de encaminhar as mensagens pa
 ```pip install pika```
 
 Instalação feita, após isso, basta rodar o MessageProducer.java, Message_Consumer.py e backend_aditoria.py.
+
+Integrantes:
+
+Adaury Neto
+Guilherme Alcoforado
+Pedro Xavier
+Théo Moura
